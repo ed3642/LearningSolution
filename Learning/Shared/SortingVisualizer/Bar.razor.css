@@ -1,8 +1,4 @@
-﻿.array-container {
-    height: 100%;
-}
-
-.array-bar {
+﻿.array-bar {
     display: inline-block;
     background-color: dodgerblue;
 }

@@ -10,7 +10,7 @@
 <MudButtonGroup Variant="Variant.Outlined" Color="Color.Primary">
     <MudButton @onclick="() => CsharpSort()">C# Built-In Sort</MudButton>
     <MudButton @onclick="() => BubbleSort()">Bubble Sort</MudButton>
-    <MudButton @onclick="() => MergeSort()">Merge Sort</MudButton>
+    <MudButton @onclick="() => MergeSort(GeneratedList)">Merge Sort</MudButton>
 </MudButtonGroup>
 
 <MudSlider @onchange="() => NewArray(NextSize, MinVal, MaxVal, true)" 
@@ -27,8 +27,8 @@
 <div class="array-container">
     @for (var i = 0; i < ArraySize; i++)
     {
-        <div id="@i" class="array-bar" style=@(
-            $"width: {@RandomArrayPercentages[i].Item1}%;height: {@RandomArrayPercentages[i].Item2}%;")>
-        </div>
+        <Bar @ref="i"
+            BarWidth="@RandomArrayPercentages[i].Item1" BarHeight="@RandomArrayPercentages[i].Item2">
+        </Bar>
     }
 </div>

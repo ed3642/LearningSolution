@@ -25,7 +25,22 @@ namespace Learning.Shared
       NewArray(ArraySize, MinVal, MaxVal);
     }
 
-    protected void MergeSort()
+    protected void MergeSort(List<int> arr)
+    {
+      var aIndex = 0;
+      var bIndex = arr.Count - 1;
+      var middleIndex = (int)Math.Floor((decimal)(bIndex - aIndex) / 2) + aIndex;
+      var a = arr[aIndex];
+      var b = arr[bIndex];
+      var m = arr[middleIndex];
+
+      if (aIndex != bIndex)
+      {
+
+      }
+    }
+
+    private void Merge(List<int> arr, int a, int b, int m)
     {
 
     }
@@ -34,19 +49,21 @@ namespace Learning.Shared
     {
       var watch = System.Diagnostics.Stopwatch.StartNew();
 
-      for (var i = 0; i < RandomArrayPercentages.Count; i++)
+      for (var i = 0; i < GeneratedList.Count; i++)
       {
-        for (var j = 0; j < RandomArrayPercentages.Count - 1; j++)
+        for (var j = 0; j < GeneratedList.Count - 1; j++)
         {
-          var left = RandomArrayPercentages[j].Item2;
-          var right = RandomArrayPercentages[j + 1].Item2;
+          var left = GeneratedList[j];
+          var right = GeneratedList[j + 1];
 
           if (right < left)
           {
-            (RandomArrayPercentages[j], RandomArrayPercentages[j + 1]) = (RandomArrayPercentages[j + 1], RandomArrayPercentages[j]);
+            (GeneratedList[j], GeneratedList[j + 1]) = (GeneratedList[j + 1], GeneratedList[j]);
           }
         }
       }
+
+      GetPercentageArray(GeneratedList);
 
       watch.Stop();
       SortTimer = watch.ElapsedMilliseconds;
