@@ -3,15 +3,19 @@
 <PageTitle>Sorting Visualizer</PageTitle>
 
 <MudButtonGroup Variant="Variant.Outlined" Color="Color.Info">
-    <MudButton @onclick="() => ResetArray()">Reset Array</MudButton>
     <MudButton @onclick="() => NewArray(ArraySize, MinVal, MaxVal)">New Array</MudButton>
 </MudButtonGroup>
 
-<MudButtonGroup Variant="Variant.Outlined" Color="Color.Primary">
+<MudButtonGroup Variant="Variant.Outlined" Color="Color.Default">
     <MudButton @onclick="() => CsharpSort()">C# Built-In Sort</MudButton>
+</MudButtonGroup>
+
+<MudButtonGroup Variant="Variant.Outlined" Color="Color.Primary">
     <MudButton @onclick="() => BubbleSort()">Bubble Sort</MudButton>
     <MudButton @onclick="() => MergeSort(GeneratedList)">Merge Sort</MudButton>
 </MudButtonGroup>
+
+<MudCheckBox @bind-Checked="@DoAnimation" Label="Animate?"></MudCheckBox>
 
 <MudSlider @onchange="() => NewArray(NextSize, MinVal, MaxVal, true)" 
     @bind-Value="@NextSize" 
@@ -20,15 +24,23 @@
     Color="Color.Info">Size: @NextSize
 </MudSlider>
 
-<p>Sorted in: @SortTimer ms</p>
+<p>C# Sort Time: @SortTimer ms</p>
 
 <MudDivider DividerType="DividerType.Middle" Class="my-4"/>
 
 <div class="array-container">
     @for (var i = 0; i < ArraySize; i++)
     {
-        <Bar @ref="i"
-            BarWidth="@RandomArrayPercentages[i].Item1" BarHeight="@RandomArrayPercentages[i].Item2">
-        </Bar>
+        <div class="array-bar" style=@(
+            $"width: {@RandomArrayPercentages[i].WidthP}%;height: {@RandomArrayPercentages[i].HeightP}%; {SelectBar(i)}")>
+        </div>
     }
 </div>
+
+<h3>Notes:</h3>
+<MudPaper>
+    <MudList>
+        <MudListItem Text="Interesting Behavior when clicking New Array button or sliding the size when an animation is playing." />
+    </MudList>
+</MudPaper>
+<br/>

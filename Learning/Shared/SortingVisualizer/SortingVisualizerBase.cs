@@ -8,6 +8,7 @@ namespace Learning.Shared
     [CascadingParameter]
     public CascadingAppState AppState { get; set; } = null!;
 
+    public bool DoAnimation { get; set; }
     public long SortTimer { get; set; } = 0;
     public int NextSize { get; set; }
     public int MinArraySize { get; set; } = 2;
@@ -16,9 +17,24 @@ namespace Learning.Shared
     public int MinVal { get; set; } = 5;
     public int MaxVal { get; set; } = 100;
     public List<int> GeneratedList { get; set; } = null!;
-    public List<Tuple<double, double>> RandomArrayPercentages { get; set; } = null!;
+    public List<RenderedBar> RandomArrayPercentages { get; set; } = null!;
 
-    private List<int> _originalOrder = new List<int>();
+    public struct RenderedBar
+    {
+      public RenderedBar(double widthP, double heightP, bool isSelected = false)
+      {
+        WidthP = widthP;
+        HeightP = heightP;
+        IsSelected = isSelected;
+      }
+
+      public double WidthP { get; set; }
+      public double HeightP { get; set; }
+      public bool IsSelected { get; set; }
+    }
+
+    private int _left = -1;
+    private int _right = -1;
 
     protected override void OnInitialized()
     {
@@ -45,7 +61,7 @@ namespace Learning.Shared
 
     }
 
-    protected void BubbleSort()
+    protected async Task BubbleSort()
     {
       var watch = System.Diagnostics.Stopwatch.StartNew();
 
@@ -53,21 +69,30 @@ namespace Learning.Shared
       {
         for (var j = 0; j < GeneratedList.Count - 1; j++)
         {
-          var left = GeneratedList[j];
-          var right = GeneratedList[j + 1];
-
-          if (right < left)
+          if (GeneratedList[j + 1] < GeneratedList[j])
           {
-            (GeneratedList[j], GeneratedList[j + 1]) = (GeneratedList[j + 1], GeneratedList[j]);
+            _left = j;
+            _right = j + 1;
+            (GeneratedList[_left], GeneratedList[_right]) = (GeneratedList[_right], GeneratedList[_left]);
+
+            GetBarProperties(_left);
+            GetBarProperties(_right);
+            if (DoAnimation)
+            {
+              StateHasChanged();
+              await Task.Delay(1);
+            }
           }
         }
       }
 
-      GetPercentageArray(GeneratedList);
+      _left = -1;
+      _right = -1;
 
       watch.Stop();
       SortTimer = watch.ElapsedMilliseconds;
     }
+
     protected void CsharpSort()
     {
       var watch = System.Diagnostics.Stopwatch.StartNew();
@@ -78,30 +103,48 @@ namespace Learning.Shared
       watch.Stop();
       SortTimer = watch.ElapsedMilliseconds;
     }
-
-    protected void ResetArray()
+    protected string SelectBar(int n)
     {
-      GetPercentageArray(_originalOrder);
+      if (n == _left)
+      {
+        return "background-color: red";
+      }
+
+      if (n == _right)
+      {
+        return "background-color: red";
+      }
+
+      return "";
+    }
+
+    protected void GetBarProperties(int i)
+    {
+      var num = GeneratedList[i];
+      var percentageX = Math.Round(value: (double)1 / ArraySize * 100, 5);
+      var percentageY = Math.Round(value: (double)num / MaxVal * 100, 5);
+
+      RandomArrayPercentages[i] = new RenderedBar(percentageX, percentageY, true);
     }
 
     protected void GetPercentageArray(List<int> arr)
     {
-      RandomArrayPercentages = new List<Tuple<double, double>>(ArraySize);
+      RandomArrayPercentages = new List<RenderedBar>();
       var percentageX = Math.Round(value: (double)1 / ArraySize * 100, 5);
 
       foreach (var num in arr)
       {
         var percentageY = Math.Round(value: (double)num / MaxVal * 100, 5);
 
-        RandomArrayPercentages.Add(Tuple.Create(percentageX, percentageY));
+        RandomArrayPercentages.Add(new RenderedBar(percentageX, percentageY));
       }
     }
 
-    // experimental to show loader
     protected void ShowLoader()
     {
       AppState.SomethingIsLoading = true;
     }
+
     protected void NewArray(int size, int min, int max, bool resize = false)
     {
       if (resize)
@@ -114,7 +157,6 @@ namespace Learning.Shared
       }
 
       GeneratedList = MathUtils.GenRandomInts(size, min, max);
-      _originalOrder = GeneratedList.ToList(); // copy by value
       GetPercentageArray(GeneratedList);
     }
   }
