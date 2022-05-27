@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>LearningProjects</title>
+    <base href="/" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+    <link href="css/app.css" rel="stylesheet" />
+    <link href="LearningProjects.styles.css" rel="stylesheet" />
+    <link href="manifest.json" rel="manifest" />
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+
+    <!-- Looks like styles dont get loaded before loading screen so we embed it here. -->
+    <style>
+        #loading-screen {
+            background-color: #263238;
+            margin: auto;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #loading-icons {
+            position: absolute;
+            width: 25%;
+            margin: auto;
+            top: 45%;
+            left: 50%;
+            -ms-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div id="loading-screen">
+            <div id="loading-icons">
+                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 640 640" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" style="background-color:transparent"><g transform="matrix(1.2 0 0 1.2-63.999982-23.774942)"><rect width="232.764267" height="346.704817" rx="0" ry="0" transform="matrix(1.580857 0 0 0.921068 136.016489 127.776201)" fill="#6d48c5" stroke-width="0" /><ellipse style="isolation:isolate" rx="196.954379" ry="55.342553" transform="translate(320 287.445557)" fill="#6d48c5" stroke-width="0" /><ellipse style="isolation:isolate" rx="196.954379" ry="55.342553" transform="translate(320 445.182007)" fill="#6d48c5" stroke-width="0" /><ellipse style="isolation:isolate" rx="196.954379" ry="55.342553" transform="translate(320 127.776201)" fill="#7550ce" stroke-width="0" /></g></svg>
+            </div>
+        </div>
+    </div>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <script src="_framework/blazor.webassembly.js"></script>
+    <script>navigator.serviceWorker.register('service-worker.js');</script>
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+</body>
+
+</html>
