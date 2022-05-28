@@ -41,24 +41,73 @@ namespace Learning.Shared
       NewArray(ArraySize, MinVal, MaxVal);
     }
 
-    protected void MergeSort(List<int> arr)
+    protected void MergeSortWrap(List<int> arr, int a, int b)
     {
-      var aIndex = 0;
-      var bIndex = arr.Count - 1;
-      var middleIndex = (int)Math.Floor((decimal)(bIndex - aIndex) / 2) + aIndex;
-      var a = arr[aIndex];
-      var b = arr[bIndex];
-      var m = arr[middleIndex];
+      var watch = System.Diagnostics.Stopwatch.StartNew();
 
-      if (aIndex != bIndex)
+      MergeSort(arr, a, b);
+
+      GeneratedList = arr;
+      GetPercentageArray(GeneratedList);
+
+      watch.Stop();
+      SortTimer = watch.ElapsedMilliseconds;
+    }
+
+    private void MergeSort(List<int> arr, int a, int b)
+    {
+
+      if (a < b)
       {
+        var m = a + (b - a) / 2; // rounds down by default
 
+        MergeSort(arr, a, m);
+        MergeSort(arr, m + 1, b);
+        Merge(arr, a, b, m);
       }
     }
 
     private void Merge(List<int> arr, int a, int b, int m)
     {
+      var leftSize = m - a + 1;
+      var rightSize = b - m;
 
+      var left = new List<int>(leftSize);
+      var right = new List<int>(rightSize);
+
+      for (var i = 0; i < leftSize; i++)
+      {
+        left.Add(arr[a + i]);
+      }
+      for (var i = 0; i < rightSize; i++)
+      {
+        right.Add(arr[m + 1 + i]);
+      }
+
+      var x = 0;
+      var y = 0;
+      var z = a;
+      while (x < leftSize && y < rightSize)
+      {
+        if (left[x] <= right[y])
+        {
+          arr[z] = left[x];
+          x++;
+        }
+        else
+        {
+          arr[z] = right[y];
+          y++;
+        }
+        z++;
+      }
+
+      while (x < leftSize)
+      {
+        arr[z] = left[x];
+        x++;
+        z++;
+      }
     }
 
     protected async Task BubbleSort()

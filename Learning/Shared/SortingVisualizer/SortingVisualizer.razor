@@ -12,7 +12,7 @@
 
 <MudButtonGroup Variant="Variant.Outlined" Color="Color.Primary">
     <MudButton @onclick="() => BubbleSort()">Bubble Sort</MudButton>
-    <MudButton @onclick="() => MergeSort(GeneratedList)">Merge Sort</MudButton>
+    <MudButton @onclick="() => MergeSortWrap(GeneratedList, 0, GeneratedList.Count - 1)">Merge Sort</MudButton>
 </MudButtonGroup>
 
 <MudCheckBox @bind-Checked="@DoAnimation" Label="Animate?"></MudCheckBox>
@@ -24,7 +24,7 @@
     Color="Color.Info">Size: @NextSize
 </MudSlider>
 
-<p>C# Sort Time: @SortTimer ms</p>
+<p>Sort Time: @SortTimer ms</p>
 
 <MudDivider DividerType="DividerType.Middle" Class="my-4"/>
 
