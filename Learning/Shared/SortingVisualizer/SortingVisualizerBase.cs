@@ -8,6 +8,7 @@ namespace Learning.Shared
     [CascadingParameter]
     public CascadingAppState AppState { get; set; } = null!;
 
+    public bool IsFastAnimation { get; set; } = true;
     public bool DoAnimation { get; set; }
     public long SortTimer { get; set; } = 0;
     public int NextSize { get; set; }
@@ -21,24 +22,78 @@ namespace Learning.Shared
 
     public struct RenderedBar
     {
-      public RenderedBar(double widthP, double heightP, bool isSelected = false)
+      public RenderedBar(double widthP, double heightP)
       {
         WidthP = widthP;
         HeightP = heightP;
-        IsSelected = isSelected;
       }
 
       public double WidthP { get; set; }
       public double HeightP { get; set; }
-      public bool IsSelected { get; set; }
     }
 
     private int _left = -1;
     private int _right = -1;
+    private int _middle = -1;
 
     protected override void OnInitialized()
     {
       NewArray(ArraySize, MinVal, MaxVal);
+    }
+
+    #region Sorting Methods
+    protected async Task SelectionSort()
+    {
+      var watch = System.Diagnostics.Stopwatch.StartNew();
+
+      int smallestBarIndex;
+      for (var i = 0; i < GeneratedList.Count - 1; i++)
+      {
+        smallestBarIndex = i;
+        for (var j = i + 1; j < GeneratedList.Count; j++)
+        {
+          if (GeneratedList[j] < GeneratedList[smallestBarIndex])
+          {
+            smallestBarIndex = j;
+          }
+        }
+
+        _left = smallestBarIndex;
+        _right = i;
+        (GeneratedList[_left], GeneratedList[_right]) = (GeneratedList[_right], GeneratedList[_left]);
+
+        await RenderSelectedBars();
+      }
+
+      DeselectBars();
+
+      watch.Stop();
+      SortTimer = watch.ElapsedMilliseconds;
+    }
+
+    protected async Task InsertionSort()
+    {
+      var watch = System.Diagnostics.Stopwatch.StartNew();
+
+      for (var i = 0; i < GeneratedList.Count - 1; i++)
+      {
+        for (var j = i + 1; j > 0; j--)
+        {
+          if (GeneratedList[j - 1] > GeneratedList[j])
+          {
+            _left = j;
+            _right = j - 1;
+            (GeneratedList[_left], GeneratedList[_right]) = (GeneratedList[_right], GeneratedList[_left]);
+
+            await RenderSelectedBars();
+          }
+        }
+      }
+
+      DeselectBars();
+
+      watch.Stop();
+      SortTimer = watch.ElapsedMilliseconds;
     }
 
     protected void MergeSortWrap(List<int> arr, int a, int b)
@@ -46,25 +101,26 @@ namespace Learning.Shared
       var watch = System.Diagnostics.Stopwatch.StartNew();
 
       MergeSort(arr, a, b);
+      GetPercentageArray(arr);
 
-      GeneratedList = arr;
-      GetPercentageArray(GeneratedList);
+      DeselectBars();
 
       watch.Stop();
       SortTimer = watch.ElapsedMilliseconds;
     }
 
-    private void MergeSort(List<int> arr, int a, int b)
+    private List<int> MergeSort(List<int> arr, int a, int b)
     {
-
       if (a < b)
       {
-        var m = a + (b - a) / 2; // rounds down by default
+        var m = a + (b - a) / 2;
 
         MergeSort(arr, a, m);
         MergeSort(arr, m + 1, b);
         Merge(arr, a, b, m);
       }
+
+      return arr;
     }
 
     private void Merge(List<int> arr, int a, int b, int m)
@@ -84,29 +140,40 @@ namespace Learning.Shared
         right.Add(arr[m + 1 + i]);
       }
 
-      var x = 0;
-      var y = 0;
-      var z = a;
-      while (x < leftSize && y < rightSize)
+      var leftIndex = 0;
+      var rightIndex = 0;
+      var mergingArrIndex = a;
+
+      // merge the smallest numbers first in both arrs
+      while (leftIndex < leftSize && rightIndex < rightSize)
       {
-        if (left[x] <= right[y])
+        if (left[leftIndex] <= right[rightIndex])
         {
-          arr[z] = left[x];
-          x++;
+          arr[mergingArrIndex] = left[leftIndex];
+          leftIndex++;
         }
         else
         {
-          arr[z] = right[y];
-          y++;
+          arr[mergingArrIndex] = right[rightIndex];
+          rightIndex++;
         }
-        z++;
+
+        mergingArrIndex++;
       }
 
-      while (x < leftSize)
+      // if one side had more bigger numbers than the other there will be left overs
+      // which are the biggest numbers. So they get added at the end.
+      while (leftIndex < leftSize)
       {
-        arr[z] = left[x];
-        x++;
-        z++;
+        arr[mergingArrIndex] = left[leftIndex];
+        leftIndex++;
+        mergingArrIndex++;
+      }
+      while (rightIndex < rightSize)
+      {
+        arr[mergingArrIndex] = right[rightIndex];
+        rightIndex++;
+        mergingArrIndex++;
       }
     }
 
@@ -124,19 +191,12 @@ namespace Learning.Shared
             _right = j + 1;
             (GeneratedList[_left], GeneratedList[_right]) = (GeneratedList[_right], GeneratedList[_left]);
 
-            GetBarProperties(_left);
-            GetBarProperties(_right);
-            if (DoAnimation)
-            {
-              StateHasChanged();
-              await Task.Delay(1);
-            }
+            await RenderSelectedBars();
           }
         }
       }
 
-      _left = -1;
-      _right = -1;
+      DeselectBars();
 
       watch.Stop();
       SortTimer = watch.ElapsedMilliseconds;
@@ -152,31 +212,45 @@ namespace Learning.Shared
       watch.Stop();
       SortTimer = watch.ElapsedMilliseconds;
     }
-    protected string SelectBar(int n)
+    #endregion
+
+    #region Rendering Methods
+    protected string StyleSelectBar(int n)
     {
-      if (n == _left)
+      if (n == _left || n == _right)
       {
         return "background-color: red";
       }
-
-      if (n == _right)
+      else if (n == _middle)
       {
-        return "background-color: red";
+        return "background-color: pink";
       }
 
       return "";
     }
 
-    protected void GetBarProperties(int i)
+    private async Task RenderSelectedBars()
+    {
+      GetBarProperties(_left);
+      GetBarProperties(_right);
+      if (DoAnimation)
+      {
+        StateHasChanged();
+        var delay = IsFastAnimation ? 1 : 1000;
+        await Task.Delay(delay);
+      }
+    }
+
+    private void GetBarProperties(int i)
     {
       var num = GeneratedList[i];
       var percentageX = Math.Round(value: (double)1 / ArraySize * 100, 5);
       var percentageY = Math.Round(value: (double)num / MaxVal * 100, 5);
 
-      RandomArrayPercentages[i] = new RenderedBar(percentageX, percentageY, true);
+      RandomArrayPercentages[i] = new RenderedBar(percentageX, percentageY);
     }
 
-    protected void GetPercentageArray(List<int> arr)
+    private void GetPercentageArray(List<int> arr)
     {
       RandomArrayPercentages = new List<RenderedBar>();
       var percentageX = Math.Round(value: (double)1 / ArraySize * 100, 5);
@@ -208,5 +282,15 @@ namespace Learning.Shared
       GeneratedList = MathUtils.GenRandomInts(size, min, max);
       GetPercentageArray(GeneratedList);
     }
+
+    private void DeselectBars()
+    {
+      _left = -1;
+      _right = -1;
+      _middle = -1;
+    }
+
+    #endregion
+
   }
 }

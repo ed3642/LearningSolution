@@ -12,10 +12,13 @@
 
 <MudButtonGroup Variant="Variant.Outlined" Color="Color.Primary">
     <MudButton @onclick="() => BubbleSort()">Bubble Sort</MudButton>
+    <MudButton @onclick="() => InsertionSort()">Insertion Sort</MudButton>
+    <MudButton @onclick="() => SelectionSort()">Selection Sort</MudButton>
     <MudButton @onclick="() => MergeSortWrap(GeneratedList, 0, GeneratedList.Count - 1)">Merge Sort</MudButton>
 </MudButtonGroup>
 
-<MudCheckBox @bind-Checked="@DoAnimation" Label="Animate?"></MudCheckBox>
+<MudCheckBox Class="mr-2" @bind-Checked="@DoAnimation" Label="Animate?"></MudCheckBox>
+<MudSwitch Disabled="@(!DoAnimation)" @bind-Checked="@IsFastAnimation" Label="Go Fast" Color="Color.Info" />
 
 <MudSlider @onchange="() => NewArray(NextSize, MinVal, MaxVal, true)" 
     @bind-Value="@NextSize" 
@@ -24,7 +27,7 @@
     Color="Color.Info">Size: @NextSize
 </MudSlider>
 
-<p>Sort Time: @SortTimer ms</p>
+<p>Sort + Render Time: @SortTimer ms</p>
 
 <MudDivider DividerType="DividerType.Middle" Class="my-4"/>
 
@@ -32,7 +35,7 @@
     @for (var i = 0; i < ArraySize; i++)
     {
         <div class="array-bar" style=@(
-            $"width: {@RandomArrayPercentages[i].WidthP}%;height: {@RandomArrayPercentages[i].HeightP}%; {SelectBar(i)}")>
+            $"width: {@RandomArrayPercentages[i].WidthP}%;height: {@RandomArrayPercentages[i].HeightP}%; {StyleSelectBar(i)}")>
         </div>
     }
 </div>
@@ -40,7 +43,8 @@
 <h3>Notes:</h3>
 <MudPaper>
     <MudList>
-        <MudListItem Text="Interesting Behavior when clicking New Array button or sliding the size when an animation is playing." />
+        <MudListItem Text="Interesting Behavior when clicking New Array button or sliding the size when an animation is playing. 
+            We could just disable buttons until its done animating but it is interesting to see the unexpected behavior." />
     </MudList>
 </MudPaper>
 <br/>
