@@ -1,0 +1,50 @@
+﻿@inherits SortingVisualizerBase
+
+<PageTitle>Sorting Visualizer</PageTitle>
+
+<MudButtonGroup Variant="Variant.Outlined" Color="Color.Info">
+    <MudButton @onclick="() => NewArray(ArraySize, MinVal, MaxVal)">New Array</MudButton>
+</MudButtonGroup>
+
+<MudButtonGroup Variant="Variant.Outlined" Color="Color.Default">
+    <MudButton @onclick="() => CsharpSort()">C# Built-In Sort</MudButton>
+</MudButtonGroup>
+
+<MudButtonGroup Variant="Variant.Outlined" Color="Color.Primary">
+    <MudButton @onclick="() => BubbleSort()">Bubble Sort</MudButton>
+    <MudButton @onclick="() => InsertionSort()">Insertion Sort</MudButton>
+    <MudButton @onclick="() => SelectionSort()">Selection Sort</MudButton>
+    <MudButton @onclick="() => MergeSortWrap(GeneratedList, 0, GeneratedList.Count - 1)">Merge Sort</MudButton>
+</MudButtonGroup>
+
+<MudCheckBox Class="mr-2" @bind-Checked="@DoAnimation" Label="Animate?"></MudCheckBox>
+<MudSwitch Disabled="@(!DoAnimation)" @bind-Checked="@IsFastAnimation" Label="Go Fast" Color="Color.Info" />
+
+<MudSlider @onchange="() => NewArray(NextSize, MinVal, MaxVal, true)" 
+    @bind-Value="@NextSize" 
+    Min="MinArraySize" 
+    Max="MaxArraySize" 
+    Color="Color.Info">Size: @NextSize
+</MudSlider>
+
+<p>Sort + Render Time: @SortTimer ms</p>
+
+<MudDivider DividerType="DividerType.Middle" Class="my-4"/>
+
+<div class="array-container">
+    @for (var i = 0; i < ArraySize; i++)
+    {
+        <div class="array-bar" style=@(
+            $"width: {@RandomArrayPercentages[i].WidthP}%;height: {@RandomArrayPercentages[i].HeightP}%; {StyleSelectBar(i)}")>
+        </div>
+    }
+</div>
+
+<h3>Notes:</h3>
+<MudPaper>
+    <MudList>
+        <MudListItem Text="Interesting Behavior when clicking New Array button or sliding the size when an animation is playing. 
+            We could just disable buttons until its done animating but it is interesting to see the unexpected behavior." />
+    </MudList>
+</MudPaper>
+<br/>
